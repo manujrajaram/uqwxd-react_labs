@@ -3,6 +3,8 @@ import "./App.css";
 const App = () => {
   const [todos, setTodos] = React.useState([]);
   const [todo, setTodo] = React.useState("");
+  const [todoEditing, setTodoEditing] = React.useState(null);
+  const [editingText, setEditingText] = React.useState("");
 
   // Add the handlesubmit code here
   function handleSubmit(e){
@@ -40,7 +42,16 @@ const App = () => {
   }
   
   // Add the submitEdits code here
-
+  function submitEdits(id){
+      const updatedTodos = [...todos].map((todo)=>{
+          if (todo.id === id){
+              todo.text = editingText;
+          }
+          return todo;
+      });
+      setTodos(updatedTodos);
+      setTodoEditing(null);
+  }
   
 return(
 <div id="todo-list">
@@ -53,15 +64,35 @@ return(
         />
         <button type="submit">Add Todo</button>
     </form>
-    {todos.map((todo)=> 
-    <div className="todo" key={todo.id}>
-        <div>{todo.text}</div>
-        <input type="checkbox" id="completed" checked={todo.completed} onChange={() => toggleComplete(todo.id)}/>
-        <button onClick={() => deleteTodo(todo.id)}>Delete</button>
-    </div>
-    )}
-
-</div>
-);
-};
+    {todos.map((todo) => (
+            <div key={todo.id} className="todo">
+              <div className="todo-text">
+                <input
+                  type="checkbox"
+                  id="completed"
+                  checked={todo.completed}
+                  onChange={() => toggleComplete(todo.id)}
+                />
+                {todo.id === todoEditing ? (
+                  <input
+                    type="text"
+                    onChange={(e) => setEditingText(e.target.value)}
+                  />
+                ) : (
+                  <div>{todo.text}</div>
+                )}
+              </div>
+              <div className="todo-actions">
+                {todo.id === todoEditing ? (
+                  <button onClick={() => submitEdits(todo.id)}>Submit Edits</button>
+                ) : (
+                  <button onClick={() => setTodoEditing(todo.id)}>Edit</button>
+                )}
+                <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
 export default App;
